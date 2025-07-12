@@ -1,0 +1,12 @@
+[package]
+name = "city-generation"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+image = "0.25.6"
+pathfinding = "4.14.0"
+rand = "0.9.1"
+rand_chacha = "0.9.0"
+rayon = "1.10.0"
+clap = { version = "4.5.29", features = ["derive"] }
