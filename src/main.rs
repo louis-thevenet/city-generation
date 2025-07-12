@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, time::Instant};
 
 use clap::Parser;
 use image::{ImageBuffer, ImageResult, Rgb};
@@ -35,10 +35,10 @@ fn city_generator(cli: &Cli) -> ImageResult<()> {
     let important_buildings = cli.important_buildings;
     let important_buildings_max_distance = cli.max_distance_seeds;
     let important_buildings_scale = cli.scale_seeds;
-    let seed = cli.seed;
+    let seed = cli.seed.unwrap_or_else(random);
 
     let mut city_gen = CityGenerator::new(
-        seed.unwrap_or(random()),
+        seed,
         8..30,
         8..30,
         20..100,
@@ -46,8 +46,8 @@ fn city_generator(cli: &Cli) -> ImageResult<()> {
     );
 
     city_gen.generate(buildings, important_buildings, important_buildings_scale);
+    println!("Seed is {seed}",);
 
-    // city_gen.generate_roads_astar();
     let mut img = ImageBuffer::new(
         10 + (city_gen.max_x - city_gen.min_x) as u32,
         10 + (city_gen.max_y - city_gen.min_y) as u32,

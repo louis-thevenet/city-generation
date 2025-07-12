@@ -2,7 +2,7 @@ use pathfinding::prelude::astar;
 use rand::{seq::IteratorRandom, Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use rayon::slice::ParallelSliceMut;
-use std::{collections::HashMap, ops::Range};
+use std::{collections::HashMap, ops::Range, time::Instant};
 
 const CITY_BOUNDS_OFFSET: i32 = 20;
 
@@ -151,9 +151,25 @@ impl CityGenerator {
         important_building_scale: i32,
     ) {
         println!("Generating important buildings");
+
+        let now = Instant::now();
         self.generate_important_buildings(important_buildings, important_building_scale);
+        let duration = now.elapsed();
+        println!(
+            "Generated {} important buildings in {}",
+            important_buildings,
+            duration.as_secs_f32()
+        );
+
         println!("Generating normal buildings");
+        let now = Instant::now();
         self.generate_buildings(normal_buildings);
+        let duration = now.elapsed();
+        println!(
+            "Generated {} buildings in {}",
+            normal_buildings,
+            duration.as_secs_f32()
+        );
         self.update_borders();
     }
     fn generate_important_buildings(&mut self, n: usize, important_building_scale: i32) {
