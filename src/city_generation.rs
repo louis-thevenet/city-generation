@@ -52,23 +52,23 @@ impl Building {
         height: i32,
         id: usize,
     ) -> Self {
-        let (door_x, door_y) = if rng.gen_bool(0.5) {
+        let (door_x, door_y) = if rng.random_bool(0.5) {
             // on northern or southern side
-            if rng.gen_bool(0.5) {
+            if rng.random_bool(0.5) {
                 // northern side
-                (rng.gen_range(x..x + width), y)
+                (rng.random_range(x..x + width), y)
             } else {
                 // southern side
-                (rng.gen_range(x..x + width), y + height)
+                (rng.random_range(x..x + width), y + height)
             }
         } else {
             // on eastern or western side
-            if rng.gen_bool(0.5) {
+            if rng.random_bool(0.5) {
                 // eastern side
-                (x + width, rng.gen_range(y..y + height))
+                (x + width, rng.random_range(y..y + height))
             } else {
                 // western side
-                (x, rng.gen_range(y..y + height))
+                (x, rng.random_range(y..y + height))
             }
         };
         Self {
@@ -254,17 +254,18 @@ impl CityGenerator {
     /// Generate a random important building
     fn generate_random_important_building(&mut self, scale_factor: i32) -> Building {
         let (x, y) = (
-            self.rng.gen_range(
+            self.rng.random_range(
                 -(self.important_buildings_max_distance / (scale_factor * 2))
                     ..(self.important_buildings_max_distance / (scale_factor * 2)),
             ),
-            self.rng.gen_range(
+            self.rng.random_range(
                 (-self.important_buildings_max_distance / (scale_factor * 2))
                     ..(self.important_buildings_max_distance / (scale_factor * 2)),
             ),
         );
-        let width = (self.rng.gen_range(self.width_bound.clone()) + scale_factor) / scale_factor;
-        let height = (self.rng.gen_range(self.height_bound.clone()) + scale_factor) / scale_factor;
+        let width = (self.rng.random_range(self.width_bound.clone()) + scale_factor) / scale_factor;
+        let height =
+            (self.rng.random_range(self.height_bound.clone()) + scale_factor) / scale_factor;
 
         let building =
             Building::with_random_door(&mut self.rng, x, y, width, height, 0).make_important();
@@ -294,8 +295,8 @@ impl CityGenerator {
             let x_center = x + width / 2;
             let y_center = y + height / 2;
 
-            // let distance_x = self.rng.gen_range(self.distance_bound.clone());
-            // let distance_y = self.rng.gen_range(self.distance_bound.clone());
+            // let distance_x = self.rng.random_range(self.distance_bound.clone());
+            // let distance_y = self.rng.random_range(self.distance_bound.clone());
 
             let distance_x = ((self.distance_bound.end - self.distance_bound.start) as f32
                 * n as f32
@@ -306,20 +307,20 @@ impl CityGenerator {
                 * (n as f32 / init_n)) as i32
                 + self.distance_bound.start;
 
-            let spawn_x = if self.rng.gen_bool(0.5) {
+            let spawn_x = if self.rng.random_bool(0.5) {
                 x_center + distance_x
             } else {
                 x_center - distance_x
             };
 
-            let spawn_y = if self.rng.gen_bool(0.5) {
+            let spawn_y = if self.rng.random_bool(0.5) {
                 y_center + distance_y
             } else {
                 y_center - distance_y
             };
 
-            let width = self.rng.gen_range(self.width_bound.clone());
-            let height = self.rng.gen_range(self.height_bound.clone());
+            let width = self.rng.random_range(self.width_bound.clone());
+            let height = self.rng.random_range(self.height_bound.clone());
 
             let offset = 8; // minimum distance between buildings
             let new_building =
