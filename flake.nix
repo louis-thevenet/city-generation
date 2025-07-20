@@ -38,11 +38,40 @@
           devShells.default = pkgs.mkShell {
             RUST_BACKTRACE = "full";
             RUST_SRC_PATH = pkgs.rustPlatform.rustLibSrc;
+            # Wayland and graphics libraries
+            LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+              pkgs.wayland
+              pkgs.libxkbcommon
+              pkgs.vulkan-loader
+              pkgs.libGL
+              pkgs.xorg.libX11
+              pkgs.xorg.libXcursor
+              pkgs.xorg.libXrandr
+              pkgs.xorg.libXi
+            ];
+            # Environment variables for graphics
+            DISPLAY = ":0";
+            WAYLAND_DISPLAY = "wayland-1";
             packages = [
               rust-toolchain
               pkgs.clippy
               pkgs.hyperfine
               pkgs.flamelens
+              # Wayland and graphics support
+              pkgs.wayland
+              pkgs.wayland-protocols
+              pkgs.wayland-scanner
+              pkgs.libxkbcommon
+              pkgs.vulkan-headers
+              pkgs.vulkan-loader
+              pkgs.libGL
+              pkgs.pkg-config
+              # X11 fallback support
+              pkgs.xorg.libX11
+              pkgs.xorg.libXcursor
+              pkgs.xorg.libXrandr
+              pkgs.xorg.libXi
+              pkgs.xorg.libXinerama
             ];
           };
         };
