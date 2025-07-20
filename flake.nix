@@ -35,6 +35,63 @@
 
         in
         {
+          packages.default = pkgs.rustPlatform.buildRustPackage {
+            pname = "city-generation";
+            version = "0.1.0";
+
+            src = ./.;
+
+            cargoLock = {
+              lockFile = ./Cargo.lock;
+            };
+
+            nativeBuildInputs = with pkgs; [
+              pkg-config
+              rustPlatform.bindgenHook
+              makeWrapper
+            ];
+
+            buildInputs = with pkgs; [
+              # Wayland and graphics support
+              wayland
+              wayland-protocols
+              libxkbcommon
+              vulkan-loader
+              libGL
+              # X11 fallback support
+              xorg.libX11
+              xorg.libXcursor
+              xorg.libXrandr
+              xorg.libXi
+              xorg.libXinerama
+            ];
+
+            # Set up runtime environment
+            postInstall = ''
+              wrapProgram $out/bin/city-generation \
+                --set LD_LIBRARY_PATH "${
+                  pkgs.lib.makeLibraryPath [
+                    pkgs.wayland
+                    pkgs.libxkbcommon
+                    pkgs.vulkan-loader
+                    pkgs.libGL
+                    pkgs.xorg.libX11
+                    pkgs.xorg.libXcursor
+                    pkgs.xorg.libXrandr
+                    pkgs.xorg.libXi
+                  ]
+                }"
+            '';
+
+            meta = with pkgs.lib; {
+              description = "A procedural city generator with interactive visualization";
+              homepage = "https://github.com/your-username/city-generation";
+              license = licenses.mit; # Adjust if you have a different license
+              maintainers = [ ];
+              platforms = platforms.linux;
+            };
+          };
+
           devShells.default = pkgs.mkShell {
             RUST_BACKTRACE = "full";
             RUST_SRC_PATH = pkgs.rustPlatform.rustLibSrc;
