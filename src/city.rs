@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::building::Building;
+use crate::{building::Building, city_generation::CellType};
 const CITY_BOUNDS_OFFSET: i32 = 20;
 
 /// Represents a city with buildings and roads.
@@ -19,6 +19,7 @@ pub struct City {
     pub max_x: i32,
     /// y coordinate of the bottommost building
     pub max_y: i32,
+    pub is_something: HashMap<(i32, i32), CellType>,
 }
 
 impl Default for City {
@@ -31,6 +32,7 @@ impl Default for City {
             buildings: HashMap::new(),
             important_buildings: vec![],
             roads: vec![],
+            is_something: HashMap::new(),
         }
     }
 }

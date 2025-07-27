@@ -6,7 +6,8 @@ use std::{collections::HashMap, ops::Range, time::Instant};
 
 use crate::{building::Building, city::City};
 
-enum CellType {
+#[derive(Clone)]
+pub enum CellType {
     Road,
     Building,
 }
@@ -72,6 +73,7 @@ impl CityGenerator {
             duration.as_secs_f32()
         );
         city.update_borders();
+        city.is_something = self.is_something.clone();
         city
     }
     fn generate_important_buildings(&mut self, n: usize, important_building_scale: i32) -> City {
