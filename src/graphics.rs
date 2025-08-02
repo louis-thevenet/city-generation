@@ -1,4 +1,6 @@
 use pixels::{Error, Pixels, SurfaceTexture};
+use rayon::iter::{IndexedParallelIterator, ParallelIterator};
+use rayon::slice::ParallelSliceMut;
 use winit::event::{Event, WindowEvent};
 use winit::event_loop::EventLoop;
 use winit::keyboard::KeyCode;
@@ -104,21 +106,11 @@ impl CityExplorer {
     ///
     /// Assumes the default texture format: `wgpu::TextureFormat::Rgba8UnormSrgb`
     fn draw(&self, frame: &mut [u8]) {
-        for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+        frame.par_chunks_mut(4).enumerate().for_each(|(i, pixel)| {
             let x_frame = (i % self.window_size.0 as usize) as i32;
             let y_frame = (i / self.window_size.0 as usize) as i32;
             let x1 = self.origin.0 - (self.window_size.0 as i32 / 2);
-            // let x2 = self.origin.0 + (self.window_size.0 as i32 / 2);
             let y1 = self.origin.1 - (self.window_size.1 as i32 / 2);
-            // let y2 = self.origin.1 + (self.window_size.1 as i32 / 2);
-
-            // println!(
-            //     "{},{} <=> {},{}",
-            //     x_frame,
-            //     y_frame,
-            //     x1 + x_frame,
-            //     y1 + y_frame
-            // );
 
             let rgba = match self.city.is_something.get(&(x1 + x_frame, y1 + y_frame)) {
                 Some(CellType::Building) => [255, 0, 0, 255],
@@ -127,6 +119,6 @@ impl CityExplorer {
             };
 
             pixel.copy_from_slice(&rgba);
-        }
+        });
     }
 }
