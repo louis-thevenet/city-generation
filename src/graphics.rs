@@ -50,35 +50,43 @@ pub fn start_city_explorer(city: City) -> Result<(), Error> {
             }
         }
 
-        let mut delta = (0, 0);
         // Handle input events
+        let mut delta = (0, 0);
         if input.update(&event) {
             // Handle keyboard events
             if input.key_pressed(KeyCode::ArrowLeft) || input.key_held(KeyCode::ArrowLeft) {
-                city_explorer.origin.0 -= 10;
                 delta.0 = -10;
             }
             if input.key_pressed(KeyCode::ArrowRight) || input.key_held(KeyCode::ArrowRight) {
-                city_explorer.origin.0 += 10;
                 delta.0 = 10;
             }
             if input.key_pressed(KeyCode::ArrowUp) || input.key_held(KeyCode::ArrowUp) {
-                city_explorer.origin.1 -= 10;
                 delta.1 = -10;
             }
             if input.key_pressed(KeyCode::ArrowDown) || input.key_held(KeyCode::ArrowDown) {
-                city_explorer.origin.1 += 10;
                 delta.1 = 10;
             }
             if input.key_pressed(KeyCode::Escape) || input.close_requested() {
                 elwt.exit();
                 return;
             }
+            let delta = match delta {
+                (0, 0) => None,
+                (x, y) => Some((
+                    x * (if input.key_held(KeyCode::ShiftLeft) {
+                        2
+                    } else {
+                        1
+                    }),
+                    y * (if input.key_held(KeyCode::ShiftLeft) {
+                        2
+                    } else {
+                        1
+                    }),
+                )),
+            };
 
-            match delta {
-                (0, 0) => (),
-                delta => city_explorer.redraw_pixels(Some(delta)),
-            }
+            city_explorer.redraw_pixels(delta);
 
             // Resize the window
             if let Some(size) = input.window_resized() {
@@ -94,7 +102,7 @@ pub fn start_city_explorer(city: City) -> Result<(), Error> {
                 }
             }
             // Update internal state and request a redraw
-            city_explorer.update();
+            city_explorer.update(delta);
             window.request_redraw();
         }
     });
@@ -115,9 +123,13 @@ impl CityExplorer {
         res
     }
 
-    fn update(&mut self) {}
+    fn update(&mut self, delta: Option<(i8, i8)>) {
+        self.origin.0 += delta.unwrap_or((0, 0)).0 as i32;
+        self.origin.1 += delta.unwrap_or((0, 0)).1 as i32;
+    }
 
-    fn redraw_pixels(&mut self, delta: Option<(i8, i8)>) {
+    /// There is potential to clerverly use the `delta` parameter to only redraw the pixels that have changed. But for now, it's okay as it is.
+    fn redraw_pixels(&mut self, _delta: Option<(i8, i8)>) {
         self.pixels
             .par_chunks_mut(4)
             .enumerate()
